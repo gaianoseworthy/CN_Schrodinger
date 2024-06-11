@@ -1,0 +1,10 @@
+[Dolphin]
+HeaderColumnWidths=351,73,98,94,167
+PreviewsShown=false
+Timestamp=2024,6,11,10,44,2.352
+Version=4
+ViewMode=1
+VisibleRoles=Details_text,Details_modificationtime,Details_size,Details_creationtime,Details_accesstime,CustomizedDetails
+
+[Settings]
+HiddenFilesShown=true
