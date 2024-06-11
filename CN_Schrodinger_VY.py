@@ -30,7 +30,7 @@ plt.rcParams.update(params)
 plt.rcParams['savefig.dpi'] = 300
 n = 100
 m = 5000
-N = 1000
+N = 10000
 
 def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
        top=1,bottom=-1,N=500,sigmax=0.1,sigmay=0.1, lam = 1, m1 = 1, m2 = 1,
@@ -125,10 +125,10 @@ def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay):
 sol = CN(wavefunc,n=n,m=m,N=N,
          left=-10,right=10,bottom=-10,top=90,
          x0=0,y0=75,sigmax=1,sigmay=1,
-         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=250, N_frames = 401);
+         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=100, N_frames = 401);
 
 outdir = os.path.join(os.getcwd(),"output/")
-UNIQUE_STRING = "InitY_{}x{}x{}".format(n,m,N)
+UNIQUE_STRING = "InitYLarge_{}x{}x{}".format(n,m,N)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 np.save(outdir + "CNSResults_{}.npy".format(UNIQUE_STRING), np.array(sol[3]))
@@ -215,21 +215,21 @@ plt.xlabel('Oscillator Coordinate')
 ani = animation.FuncAnimation(fig,animate,np.arange(0, N-1), blit=True,interval=10000/N);
 ani.save(filename="output/PsiEvo_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
 
-X,Y = np.meshgrid(x,y)
-Y = np.flip(Y)
-fig = plt.figure(figsize=(6,6))
-ax = fig.add_subplot(projection = '3d')
-ax.view_init(30,110,0)
-ax.plot_surface(X,Y,Z[0,:,:], cmap = cm.coolwarm, antialiased=False, linewidth=0)
+#X,Y = np.meshgrid(x,y)
+#Y = np.flip(Y)
+#fig = plt.figure(figsize=(6,6))
+#ax = fig.add_subplot(projection = '3d')
+#ax.view_init(30,110,0)
+#ax.plot_surface(X,Y,Z[0,:,:], cmap = cm.coolwarm, antialiased=False, linewidth=0)
 
-def animate3d(frame):
-    ax.cla()
-    ax.plot_surface(X,Y,Z[frame,:,:], rstride=1, cstride=1, cmap = cm.coolwarm, antialiased=False, linewidth=0)
-    ax.set_zlim(0, 0.15)
-    return fig,
-bar.set_label('probability density $|\psi(t,x,y)|^2$')
-ax.set_ylabel('Projectile Coordinate')
-ax.set_xlabel('Oscillator Coordinate')
-ax.set_zlabel('Psi Amplitude $|\psi(t,x,y)|^2$')
-ani = animation.FuncAnimation(fig = fig, func = animate3d, frames = np.arange(0, N-1),interval=10000/N, repeat=True);
-ani.save(filename="output/PsiEvo3D_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
+#def animate3d(frame):
+#    ax.cla()
+#    ax.plot_surface(X,Y,Z[frame,:,:], rstride=1, cstride=1, cmap = cm.coolwarm, #antialiased=False, linewidth=0)
+#    ax.set_zlim(0, 0.15)
+#    return fig,
+#bar.set_label('probability density $|\psi(t,x,y)|^2$')
+#ax.set_ylabel('Projectile Coordinate')
+#ax.set_xlabel('Oscillator Coordinate')
+#ax.set_zlabel('Psi Amplitude $|\psi(t,x,y)|^2$')
+#ani = animation.FuncAnimation(fig = fig, func = animate3d, frames = np.arange(0, #N-1),interval=10000/N, repeat=True);
+#ani.save(filename="output/PsiEvo3D_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
