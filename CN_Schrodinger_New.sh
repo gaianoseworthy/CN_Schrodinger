@@ -6,4 +6,4 @@
 #SBATCH --mail-type=ALL
 module load python/3.10
 module load scipy-stack
-python -u "CN_Schrodinger_New .py"
+python -u "CN_Schrodinger_New.py"

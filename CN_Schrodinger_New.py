@@ -29,7 +29,7 @@ params = {"ytick.color" : "black",
 plt.rcParams.update(params)
 plt.rcParams['savefig.dpi'] = 300
 n = 100
-m = 5000
+m = 500
 N = 1000
 
 def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
@@ -123,12 +123,12 @@ def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay):
             (1/np.sqrt(2) * np.pi**(-1/4) * np.exp(-x**2/2)))
 
 sol = CN(wavefunc,n=n,m=m,N=N,
-         left=-5,right=5,bottom=-25,top=25,
+         left=-5,right=5,bottom=-5,top=45,
          x0=0,y0=10,sigmax=1,sigmay=3,
-         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=100, N_frames = 401);
+         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=30, N_frames = 401);
 
 outdir = os.path.join(os.getcwd(),"output/")
-UNIQUE_STRING = "InitYLarge_{}x{}x{}".format(n,m,N)
+UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 np.save(outdir + "CNSResults_{}.npy".format(UNIQUE_STRING), np.array(sol[3]))
@@ -152,10 +152,11 @@ Y = np.diag(y)
 Y2 = np.diag(np.vectorize(lambda x : x**2)(y))
 Px = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n))
 HPx = (1/(2*1)) * (Px**2) + (1/2)*X2
+Py = (-1/(hy**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m))
 psi = np.zeros((N+1,n,m),dtype='complex')
 Z = np.zeros((N+1,m,n),dtype='float')
 
-observables = np.zeros((N+1,4))
+observables = np.zeros((N+1,9))
 
 def F(x):
     if abs(x)>1e-14:
@@ -170,36 +171,72 @@ for i in range (0,N+1):
     psi[i,:,:] = np.transpose(gnat)
     rho1 = hx*hy*np.matmul(psi[i,:,:],psi[i,:,:].conj().T)
     rho2 = hx*hy*np.matmul(psi[i,:,:].T,psi[i,:,:].conj())
+    # Time
     observables[i,0] = T[i]
+    # Error
     observables[i,1] = np.real(np.trace(rho1))-1
-    #observables[i,2] = np.real(np.trace(np.matmul(rho1,X)))
-    #observables[i,3] = (np.real(np.trace(np.matmul(rho1,X2)))-observables[i,2]**2)**(0.5)
-    #observables[i,4] = np.real(np.trace(np.matmul(rho2,Y)))
-    #observables[i,5] = (np.real(np.trace(np.matmul(rho2,Y2)))-observables[i,4]**2)**(0.5)
+    # Von Neumann Entanglement Entropy
     observables[i,2] = np.sum(np.vectorize(F)(np.linalg.eig(rho1)[0]))
+    # First Hamiltonian
     observables[i,3] = np.real(np.trace(np.matmul(HPx, rho1)))
+    # Second Hamiltonian
+    #observables[i,4] = np.real(np.trace(np.matmul(rho2, Py)))
+    # <x>
+    observables[i,5] =  np.real(np.trace(np.matmul(rho1,X)))
+    # Var(x)
+    observables[i,6] = (np.real(np.trace(np.matmul(rho1,X2)))-observables[i,5]**2)**(0.5)
+    # <y>
+    observables[i,7] = np.real(np.trace(np.matmul(rho2,Y)))
+    # Var(y)
+    observables[i,8] = (np.real(np.trace(np.matmul(rho2,Y2)))-observables[i,4]**2)**(0.5)
 
 Zmax = Z.max()
 
 np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
 
+# PLOT ERROR
 fig_norm, ax_norm = plt.subplots()
 ax_norm.plot(observables[:,0],observables[:,1])
 plt.ylabel('Error in Wavefunction Normalization')
 plt.xlabel('Time $t$')
 plt.savefig(outdir + "Normalization_{}".format(UNIQUE_STRING))
 
+# PLOT ENTROPY
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,2])
 ax_S.set_ylabel('von Neumann entanglement entropy $S$')
 ax_S.set_xlabel('Time $t$')
 plt.savefig(outdir + "Entropy_{}".format(UNIQUE_STRING))
 
+# PLOT HAMILTONIAN IN X
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,3])
-ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H>$')
+ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H_1>$')
 ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "Hamiltonian_{}".format(UNIQUE_STRING))
+plt.savefig(outdir + "FirstHamiltonian_{}".format(UNIQUE_STRING))
+
+# PLOT HAMILTONIAN IN Y
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,4])
+#ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "SecondHamiltonian_{}".format(UNIQUE_STRING))
+
+# PLOT <x> WITH VAR(x)
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,5])
+ax_S.fill_between(observables[:,0], observables[:,5] - observables[:,6], observables[:,5] + observables[:,6], alpha = 0.3)
+ax_S.set_ylabel('Expected value in $x$ coordinate, $<x>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "ExpectedX_{}".format(UNIQUE_STRING))
+
+# PLOT <y> WITH VAR(y)
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,7])
+ax_S.fill_between(observables[:,0], observables[:,7] - observables[:,8], observables[:,7] + observables[:,8], alpha = 0.3)
+ax_S.set_ylabel('Expected value in $y$ coordinate, $<y>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "ExpectedY_{}".format(UNIQUE_STRING))
 
 def animate(frame):
     global Z, image

@@ -151,11 +151,12 @@ X2 = np.diag(np.vectorize(lambda x : x**2)(x))
 Y = np.diag(y)
 Y2 = np.diag(np.vectorize(lambda x : x**2)(y))
 Px = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n))
+Py = (-1/(hy**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m))
 HPx = (1/(2*1)) * (Px**2) + (1/2)*X2
 psi = np.zeros((N+1,n,m),dtype='complex')
 Z = np.zeros((N+1,m,n),dtype='float')
 
-observables = np.zeros((N+1,4))
+observables = np.zeros((N+1,5))
 
 def F(x):
     if abs(x)>1e-14:
@@ -178,6 +179,7 @@ for i in range (0,N+1):
     #observables[i,5] = (np.real(np.trace(np.matmul(rho2,Y2)))-observables[i,4]**2)**(0.5)
     observables[i,2] = np.sum(np.vectorize(F)(np.linalg.eig(rho1)[0]))
     observables[i,3] = np.real(np.trace(np.matmul(HPx, rho1)))
+    observables[i,4] = np.real(np.trace(np.matmul(HPy, rho2)))
 
 Zmax = Z.max()
 
@@ -197,9 +199,15 @@ plt.savefig(outdir + "Entropy_{}".format(UNIQUE_STRING))
 
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,3])
-ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H>$')
+ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H_1>$')
 ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "Hamiltonian_{}".format(UNIQUE_STRING))
+plt.savefig(outdir + "FirstHamiltonian_{}".format(UNIQUE_STRING))
+
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,4])
+ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "SecondHamiltonian_{}".format(UNIQUE_STRING))
 
 def animate(frame):
     global Z, image
