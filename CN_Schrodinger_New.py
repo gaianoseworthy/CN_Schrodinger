@@ -150,13 +150,15 @@ X = np.diag(x)
 X2 = np.diag(np.vectorize(lambda x : x**2)(x))
 Y = np.diag(y)
 Y2 = np.diag(np.vectorize(lambda x : x**2)(y))
-Px = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n))
-HPx = (1/(2*1)) * (Px**2) + (1/2)*X2
-Py = (-1/(hy**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m))
+Px2 = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n)).toarray()
+HPx = (1/(2*1)) * (Px2**2) + (1/2)*X2
+Px = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(n, n)).toarray()
+Py2 = (1/2)*(-1/hy**2)*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m)).toarray()
+Py = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(m, m)).toarray()
 psi = np.zeros((N+1,n,m),dtype='complex')
 Z = np.zeros((N+1,m,n),dtype='float')
 
-observables = np.zeros((N+1,9))
+observables = np.zeros((N+1,11))
 
 def F(x):
     if abs(x)>1e-14:
@@ -180,7 +182,7 @@ for i in range (0,N+1):
     # First Hamiltonian
     observables[i,3] = np.real(np.trace(np.matmul(HPx, rho1)))
     # Second Hamiltonian
-    #observables[i,4] = np.real(np.trace(np.matmul(rho2, Py)))
+    observables[i,4] = np.real(np.trace(np.matmul(Py2, rho2)))
     # <x>
     observables[i,5] =  np.real(np.trace(np.matmul(rho1,X)))
     # Var(x)
@@ -189,6 +191,10 @@ for i in range (0,N+1):
     observables[i,7] = np.real(np.trace(np.matmul(rho2,Y)))
     # Var(y)
     observables[i,8] = (np.real(np.trace(np.matmul(rho2,Y2)))-observables[i,4]**2)**(0.5)
+    # Px
+    observables[i,9] = np.imag(np.trace(np.matmul(rho1,Px)))
+    # Py
+    observables[i,10] = np.imag(np.trace(np.matmul(rho2, Py)))
 
 Zmax = Z.max()
 
@@ -216,27 +222,41 @@ ax_S.set_xlabel('Time $t$')
 plt.savefig(outdir + "FirstHamiltonian_{}".format(UNIQUE_STRING))
 
 # PLOT HAMILTONIAN IN Y
-#fig_S, ax_S = plt.subplots()
-#ax_S.plot(observables[:,0],observables[:,4])
-#ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
-#ax_S.set_xlabel('Time $t$')
-#plt.savefig(outdir + "SecondHamiltonian_{}".format(UNIQUE_STRING))
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,4])
+ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "SecondHamiltonian_{}".format(UNIQUE_STRING))
 
 # PLOT <x> WITH VAR(x)
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,5])
-ax_S.fill_between(observables[:,0], observables[:,5] - observables[:,6], observables[:,5] + observables[:,6], alpha = 0.3)
-ax_S.set_ylabel('Expected value in $x$ coordinate, $<x>$')
+ax_S.fill_between(observables[:,0], observables[:,5] - np.sqrt(observables[:,6]), observables[:,5] + np.sqrt(observables[:,6]), alpha = 0.3)
+ax_S.set_ylabel('Expected Value in $x$ coordinate, $<x>$')
 ax_S.set_xlabel('Time $t$')
 plt.savefig(outdir + "ExpectedX_{}".format(UNIQUE_STRING))
 
 # PLOT <y> WITH VAR(y)
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,7])
-ax_S.fill_between(observables[:,0], observables[:,7] - observables[:,8], observables[:,7] + observables[:,8], alpha = 0.3)
-ax_S.set_ylabel('Expected value in $y$ coordinate, $<y>$')
+ax_S.fill_between(observables[:,0], observables[:,7] - np.sqrt(observables[:,8]), observables[:,7] + np.sqrt(observables[:,8]), alpha = 0.3)
+ax_S.set_ylabel('Expected Value in $y$ coordinate, $<x>$')
 ax_S.set_xlabel('Time $t$')
 plt.savefig(outdir + "ExpectedY_{}".format(UNIQUE_STRING))
+
+# PLOT <Py>
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,10])
+ax_S.set_ylabel('Expected Momentum Value in $y$ coordinate, $<P_y>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "ExpectedPY_{}".format(UNIQUE_STRING))
+
+# PLOT <Px>
+fig_S, ax_S = plt.subplots()
+ax_S.plot(observables[:,0],observables[:,9])
+ax_S.set_ylabel('Expected Momentum Value in $x$ coordinate, $<P_x>$')
+ax_S.set_xlabel('Time $t$')
+plt.savefig(outdir + "ExpectedPX_{}".format(UNIQUE_STRING))
 
 def animate(frame):
     global Z, image
