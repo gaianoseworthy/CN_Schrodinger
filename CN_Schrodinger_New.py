@@ -124,8 +124,8 @@ def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay):
 
 sol = CN(wavefunc,n=n,m=m,N=N,
          left=-5,right=5,bottom=-5,top=45,
-         x0=0,y0=10,sigmax=1,sigmay=3,
-         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=30, N_frames = 401);
+         x0=0,y0=20,sigmax=1,sigmay=3,
+         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=40, N_frames = 401);
 
 outdir = os.path.join(os.getcwd(),"output/")
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
@@ -194,7 +194,7 @@ for i in range (0,N+1):
     # Px
     observables[i,9] = np.imag(np.trace(np.matmul(rho1,Px)))
     # Py
-    observables[i,10] = np.imag(np.trace(np.matmul(rho2, Py)))
+    observables[i,10] = (-1)*np.imag(np.trace(np.matmul(rho2, Py)))
 
 Zmax = Z.max()
 
