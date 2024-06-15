@@ -151,7 +151,7 @@ X2 = np.diag(np.vectorize(lambda x : x**2)(x))
 Y = np.diag(y)
 Y2 = np.diag(np.vectorize(lambda x : x**2)(y))
 Px2 = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n)).toarray()
-HPx = (1/(2*1)) * (Px2**2) + (1/2)*X2
+HPx = (1/(2*1)) * (Px2) + (1/2)*X2
 Px = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(n, n)).toarray()
 Py2 = (1/2)*(-1/hy**2)*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m)).toarray()
 Py = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(m, m)).toarray()
