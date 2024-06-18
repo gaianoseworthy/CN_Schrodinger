@@ -135,7 +135,7 @@ sol = CN(wavefunc,n=n,m=m,N=N,
          x0=0,y0=20,sigmax=1,sigmay=3,
          lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
-outdir = os.path.join(os.getcwd(),"output/mass_results/m1{}_m2{}_vy{}/".format(m1,m2,vy))
+outdir = os.path.join(os.getcwd(),"output/mass_results/Job1_{}_{}_{}/".format(int(m1),int(m2),int(vy)))
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
@@ -278,7 +278,7 @@ bar.set_label('probability density $|\psi(t,x,y)|^2$')
 plt.ylabel('Projectile Coordinate')
 plt.xlabel('Oscillator Coordinate')
 ani = animation.FuncAnimation(fig,animate,np.arange(0, N-1), blit=True,interval=10000/N);
-ani.save(filename="output/PsiEvo_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
+ani.save(filename=outdir + "PsiEvo_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
 
 #X,Y = np.meshgrid(x,y)
 #Y = np.flip(Y)
