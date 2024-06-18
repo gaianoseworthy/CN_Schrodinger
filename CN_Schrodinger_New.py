@@ -14,6 +14,7 @@ import multiprocessing
 import datetime
 import os
 import sys
+import tracemalloc
 
 print("Number of Cores Available: ", multiprocessing.cpu_count())
 
@@ -31,6 +32,14 @@ plt.rcParams['savefig.dpi'] = 300
 n = 100
 m = 500
 N = 1000
+
+mvals = [0.5, 1, 2]
+vyvals = [0.5, 1, 5]
+
+val = int(sys.argv[1])
+m1 = mvals[int(val/9)]
+m2 = mvals[int((val%9)/3)]
+vy = vyvals[int(val%3)]
 
 def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
        top=1,bottom=-1,N=500,sigmax=0.1,sigmay=0.1, lam = 1, m1 = 1, m2 = 1,
@@ -121,13 +130,12 @@ def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay):
     return (exp(-vx*1j*x)*exp(-vy*1j*y)*
             exp(-(y-y0)**2/4/sigmay**2)*
             (1/np.sqrt(2) * np.pi**(-1/4) * np.exp(-x**2/2)))
-
 sol = CN(wavefunc,n=n,m=m,N=N,
          left=-5,right=5,bottom=-5,top=45,
          x0=0,y0=20,sigmax=1,sigmay=3,
-         lam=1,m1=1,m2=1,vx=0,vy=1,t_max=40, N_frames = 401);
+         lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
-outdir = os.path.join(os.getcwd(),"output/")
+outdir = os.path.join(os.getcwd(),"output/mass_results/m1{}_m2{}_vy{}/".format(m1,m2,vy))
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
@@ -151,9 +159,9 @@ X2 = np.diag(np.vectorize(lambda x : x**2)(x))
 Y = np.diag(y)
 Y2 = np.diag(np.vectorize(lambda x : x**2)(y))
 Px2 = (-1/(hx**2))*sps.diags([1, -2, 1], [-1, 0, 1], shape=(n, n)).toarray()
-HPx = (1/(2*1)) * (Px2) + (1/2)*X2
+HPx = (1/(2*m1)) * (Px2) + (m1/2)*X2
 Px = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(n, n)).toarray()
-Py2 = (1/2)*(-1/hy**2)*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m)).toarray()
+Py2 = (1/(2*m2))*(-1/hy**2)*sps.diags([1, -2, 1], [-1, 0, 1], shape=(m, m)).toarray()
 Py = (-1/(2*hx))*sps.diags([-1, 0, 1], [-1, 0, 1], shape=(m, m)).toarray()
 psi = np.zeros((N+1,n,m),dtype='complex')
 Z = np.zeros((N+1,m,n),dtype='float')
