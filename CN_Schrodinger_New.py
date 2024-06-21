@@ -30,7 +30,7 @@ params = {"ytick.color" : "black",
 plt.rcParams.update(params)
 plt.rcParams['savefig.dpi'] = 300
 n = 100
-m = 500
+m = 1000
 N = 1000
 
 mvals = [0.5, 1, 2]
@@ -75,7 +75,7 @@ def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
 
     #initial data
     X,Y = meshgrid(x, y)
-    Z = f(X, Y, x0, y0, vx, vy, sigmax, sigmay)
+    Z = f(X, Y, x0, y0, vx, vy, sigmax, sigmay, m1, m2)
 
     #Define a basic form of psi for calculating and another for animating
     psi = np.zeros((1,k),dtype='complex')
@@ -126,16 +126,17 @@ def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
     print('************************************************************************')
     return([T,x,y,psi_out,[left,right,bottom,top]])
 
-def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay):
+def wavefunc(x,y, x0, y0, vx, vy, sigmax, sigmay, m1, m2):
     return (exp(-vx*1j*x)*exp(-vy*1j*y)*
             exp(-(y-y0)**2/4/sigmay**2)*
-            (1/np.sqrt(2) * np.pi**(-1/4) * np.exp(-x**2/2)))
+            (1/np.sqrt(2) * (m1/np.pi)**(1/4) * np.exp(-m1 * x**2/2)))
+
 sol = CN(wavefunc,n=n,m=m,N=N,
-         left=-5,right=5,bottom=-5,top=45,
+         left=-5,right=5,bottom=-5,top=95,
          x0=0,y0=20,sigmax=1,sigmay=3,
          lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
-outdir = os.path.join(os.getcwd(),"output/mass_results/Job1_{}_{}_{}/".format(int(m1),int(m2),int(vy)))
+outdir = os.path.join(os.getcwd(),"output/mass_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
@@ -227,14 +228,14 @@ fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,3])
 ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H_1>$')
 ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "FirstHamiltonian_{}".format(UNIQUE_STRING))
+plt.savefig(outdir + "HamiltonianX_{}".format(UNIQUE_STRING))
 
 # PLOT HAMILTONIAN IN Y
 fig_S, ax_S = plt.subplots()
 ax_S.plot(observables[:,0],observables[:,4])
 ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
 ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "SecondHamiltonian_{}".format(UNIQUE_STRING))
+plt.savefig(outdir + "HamiltonianY_{}".format(UNIQUE_STRING))
 
 # PLOT <x> WITH VAR(x)
 fig_S, ax_S = plt.subplots()
