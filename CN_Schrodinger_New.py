@@ -15,6 +15,7 @@ import datetime
 import os
 import sys
 import tracemalloc
+import csv
 
 print("Number of Cores Available: ", multiprocessing.cpu_count())
 
@@ -33,13 +34,13 @@ n = 100
 m = 1000
 N = 1000
 
-mvals = [0.5, 1, 2]
-vyvals = [0.5, 1, 5]
+mvals = [0.5, 1, 2, 5, 10]
+vyvals = [0.1, 0.5, 1, 2, 5]
 
 val = int(sys.argv[1])
-m1 = mvals[int(val/9)]
-m2 = mvals[int((val%9)/3)]
-vy = vyvals[int(val%3)]
+m1 = mvals[int(val/25)]
+m2 = mvals[int((val%25)/5)]
+vy = vyvals[int(val%5)]
 
 def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
        top=1,bottom=-1,N=500,sigmax=0.1,sigmay=0.1, lam = 1, m1 = 1, m2 = 1,
@@ -136,11 +137,12 @@ sol = CN(wavefunc,n=n,m=m,N=N,
          x0=0,y0=20,sigmax=1,sigmay=3,
          lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
-outdir = os.path.join(os.getcwd(),"output/mass_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
+#outdir = os.path.join(os.getcwd(),"output/test_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
+csvdir = os.path.join(os.getcwd(),"output/125_results/")
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
-if not os.path.exists(outdir):
-    os.makedirs(outdir)
-np.save(outdir + "CNSResults_{}.npy".format(UNIQUE_STRING), np.array(sol[3]))
+if not os.path.exists(csvdir):
+    os.makedirs(csvdir)
+#np.save(outdir + "CNSResults_{:02}.npy".format(UNIQUE_STRING), np.array(sol[3]))
 
 T = sol[0]
 x = sol[1]
@@ -207,79 +209,87 @@ for i in range (0,N+1):
 
 Zmax = Z.max()
 
-np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
+#m1,m2,vy, VAL
+with open(csvdir + "Hamiltonian_Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile, delimiter = ",")
+    csvwriter.writerows([[m1,m2,vy, observables[-1,3]]])
+with open(csvdir + "Entropy_Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile, delimiter = ",")
+    csvwriter.writerows([[m1,m2,vy, observables[-1,2]]])
 
-# PLOT ERROR
-fig_norm, ax_norm = plt.subplots()
-ax_norm.plot(observables[:,0],observables[:,1])
-plt.ylabel('Error in Wavefunction Normalization')
-plt.xlabel('Time $t$')
-plt.savefig(outdir + "Normalization_{}".format(UNIQUE_STRING))
+#np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
+
+## PLOT ERROR
+#fig_norm, ax_norm = plt.subplots()
+#ax_norm.plot(observables[:,0],observables[:,1])
+#plt.ylabel('Error in Wavefunction Normalization')
+#plt.xlabel('Time $t$')
+#plt.savefig(outdir + "Normalization_{}".format(UNIQUE_STRING))
 
 # PLOT ENTROPY
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,2])
-ax_S.set_ylabel('von Neumann entanglement entropy $S$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "Entropy_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,2])
+#ax_S.set_ylabel('von Neumann entanglement entropy $S$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "Entropy_{}".format(UNIQUE_STRING))
 
 # PLOT HAMILTONIAN IN X
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,3])
-ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H_1>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "HamiltonianX_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,3])
+#ax_S.set_ylabel('Hamiltonian in $x$ coordinate, $<H_1>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "HamiltonianX_{}".format(UNIQUE_STRING))
 
 # PLOT HAMILTONIAN IN Y
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,4])
-ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "HamiltonianY_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,4])
+#ax_S.set_ylabel('Hamiltonian in $y$ coordinate, $<H_2>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "HamiltonianY_{}".format(UNIQUE_STRING))
 
 # PLOT <x> WITH VAR(x)
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,5])
-ax_S.fill_between(observables[:,0], observables[:,5] - np.sqrt(observables[:,6]), observables[:,5] + np.sqrt(observables[:,6]), alpha = 0.3)
-ax_S.set_ylabel('Expected Value in $x$ coordinate, $<x>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "ExpectedX_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,5])
+#ax_S.fill_between(observables[:,0], observables[:,5] - np.sqrt(observables[:,6]), observables[:,5] + np.sqrt(observables[:,6]), alpha = 0.3)
+#ax_S.set_ylabel('Expected Value in $x$ coordinate, $<x>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "ExpectedX_{}".format(UNIQUE_STRING))
 
 # PLOT <y> WITH VAR(y)
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,7])
-ax_S.fill_between(observables[:,0], observables[:,7] - np.sqrt(observables[:,8]), observables[:,7] + np.sqrt(observables[:,8]), alpha = 0.3)
-ax_S.set_ylabel('Expected Value in $y$ coordinate, $<x>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "ExpectedY_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,7])
+#ax_S.fill_between(observables[:,0], observables[:,7] - np.sqrt(observables[:,8]), observables[:,7] + np.sqrt(observables[:,8]), alpha = 0.3)
+#ax_S.set_ylabel('Expected Value in $y$ coordinate, $<x>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "ExpectedY_{}".format(UNIQUE_STRING))
 
 # PLOT <Py>
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,10])
-ax_S.set_ylabel('Expected Momentum Value in $y$ coordinate, $<P_y>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "ExpectedPY_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,10])
+#ax_S.set_ylabel('Expected Momentum Value in $y$ coordinate, $<P_y>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "ExpectedPY_{}".format(UNIQUE_STRING))
 
 # PLOT <Px>
-fig_S, ax_S = plt.subplots()
-ax_S.plot(observables[:,0],observables[:,9])
-ax_S.set_ylabel('Expected Momentum Value in $x$ coordinate, $<P_x>$')
-ax_S.set_xlabel('Time $t$')
-plt.savefig(outdir + "ExpectedPX_{}".format(UNIQUE_STRING))
+#fig_S, ax_S = plt.subplots()
+#ax_S.plot(observables[:,0],observables[:,9])
+#ax_S.set_ylabel('Expected Momentum Value in $x$ coordinate, $<P_x>$')
+#ax_S.set_xlabel('Time $t$')
+#plt.savefig(outdir + "ExpectedPX_{}".format(UNIQUE_STRING))
 
-def animate(frame):
-    global Z, image
-    image.set_array(Z[frame,:,:])
-    return image,
-fig, ax = plt.subplots()
-image = ax.imshow(Z[0,:,:],cmap=cm.Purples,vmin=0,vmax=0.5*Zmax,extent=sol[4],aspect='auto');
+#def animate(frame):
+#    global Z, image
+#    image.set_array(Z[frame,:,:])
+#    return image,
+#fig, ax = plt.subplots()
+#image = ax.imshow(Z[0,:,:],cmap=cm.Purples,vmin=0,vmax=0.5*Zmax,extent=sol[4],aspect='auto');
 #image = ax.imshow(Z[0,:,:],cmap=cm.plasma,norm=LogNorm(vmin=1e-10, vmax=1),extent=sol[4],aspect='auto');
-bar = plt.colorbar(image)
-bar.set_label('probability density $|\psi(t,x,y)|^2$')
-plt.ylabel('Projectile Coordinate')
-plt.xlabel('Oscillator Coordinate')
-ani = animation.FuncAnimation(fig,animate,np.arange(0, N-1), blit=True,interval=10000/N);
-ani.save(filename=outdir + "PsiEvo_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
+#bar = plt.colorbar(image)
+#bar.set_label('probability density $|\psi(t,x,y)|^2$')
+#plt.ylabel('Projectile Coordinate')
+#plt.xlabel('Oscillator Coordinate')
+#ani = animation.FuncAnimation(fig,animate,np.arange(0, N-1), blit=True,interval=10000/N);
+#ani.save(filename=outdir + "PsiEvo_{}.mp4".format(UNIQUE_STRING), writer="ffmpeg")
 
 #X,Y = np.meshgrid(x,y)
 #Y = np.flip(Y)
