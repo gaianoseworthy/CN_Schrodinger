@@ -80,8 +80,8 @@ for m in m1Vals:
     ax = fig.add_subplot()
     #ax.view_init(30,110,0)
 
-    ax.set_xlabel("$m_2$ value")
-    ax.set_ylabel("$v_y$ value")
+    ax.set_xlabel("$v_y$ value")
+    ax.set_ylabel("$S_{VN}$ value")
 
     markersize = 50
     def update_prop(handle, orig):
@@ -89,13 +89,14 @@ for m in m1Vals:
         handle.set_sizes([markersize])
 
     sc = 0
-    ptr = 0
     vals = entropy[(entropy[:,0] == m)]
-    sizes = [(10*n/max_entropy)**2 for n in vals[:,3]]
-    sc = ax.scatter(vals[:,1], vals[:,2], c = vals[:,3], cmap = plt.get_cmap('cool'))
-    ptr += 1
-    #ax.legend(title="$m_1$ Value",handler_map={type(sc): HandlerPathCollection(update_func=update_prop)})
-    plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$S_{VN}$")
+    m2Vals = np.unique(entropy[:,1])
+    for m2 in m2Vals:
+        spec_vals = vals[vals[:,1] == m2]
+        sc = ax.scatter(spec_vals[:,2], spec_vals[:,3], label = "$m_2=${}".format(m2))
+        ax.plot(spec_vals[:,2], spec_vals[:,3])
+    ax.legend()
+    #plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$S_{VN}$")
     plt.savefig(plotdir + "Entropy_Plot_m1_{}.png".format(str(m).replace('.','')))
 
 #Plot the hamiltonians with color and size based on value
@@ -131,20 +132,16 @@ for m in m1Vals:
     ax = fig.add_subplot()
     #ax.view_init(30,110,0)
 
-    ax.set_xlabel("$m_2$ value")
-    ax.set_ylabel("$v_y$ value")
-
-    markersize = 50
-    def update_prop(handle, orig):
-        handle.update_from(orig)
-        handle.set_sizes([markersize])
+    ax.set_xlabel("$v_y$ value")
+    ax.set_ylabel("$H_{x}$ value")
 
     sc = 0
-    ptr = 0
     vals = hamiltonian[(hamiltonian[:,0] == m)]
-    sizes = [(10*n/max_hamiltonian)**2 for n in vals[:,3]]
-    sc = ax.scatter(vals[:,1], vals[:,2], c = vals[:,3], cmap = plt.get_cmap('cool'))
-    ptr += 1
-    #ax.legend(title="$m_1$ Value",handler_map={type(sc): HandlerPathCollection(update_func=update_prop)})
-    plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$H_{x}$")
+    m2Vals = np.unique(hamiltonian[:,1])
+    for m2 in m2Vals:
+        spec_vals = vals[vals[:,1] == m2]
+        sc = ax.scatter(spec_vals[:,2], spec_vals[:,3], label = "$m_2=${}".format(m2))
+        ax.plot(spec_vals[:,2], spec_vals[:,3])
+    ax.legend()
+    #plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$S_{VN}$")
     plt.savefig(plotdir + "Hamiltonian_Plot_m1_{}.png".format(str(m).replace('.','')))
