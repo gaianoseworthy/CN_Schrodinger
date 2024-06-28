@@ -73,6 +73,31 @@ sc = ax.scatter(entropy[:,0], entropy[:,1], entropy[:,2], c = entropy[:,3], cmap
 plt.colorbar(sc, fraction=0.036, pad = 0.1, label = "$S_{VN}$")
 plt.savefig(plotdir + "Entropy_Plot_Unsized.png")
 
+#Plot the entropies with color and size based on value on a 2D plot
+m1Vals = np.unique(entropy[:,0])
+for m in m1Vals:
+    fig = plt.figure(figsize=(6,6))
+    ax = fig.add_subplot()
+    #ax.view_init(30,110,0)
+
+    ax.set_xlabel("$m_2$ value")
+    ax.set_ylabel("$v_y$ value")
+
+    markersize = 50
+    def update_prop(handle, orig):
+        handle.update_from(orig)
+        handle.set_sizes([markersize])
+
+    sc = 0
+    ptr = 0
+    vals = entropy[(entropy[:,0] == m)]
+    sizes = [(10*n/max_entropy)**2 for n in vals[:,3]]
+    sc = ax.scatter(vals[:,1], vals[:,2], c = vals[:,3], cmap = plt.get_cmap('cool'))
+    ptr += 1
+    #ax.legend(title="$m_1$ Value",handler_map={type(sc): HandlerPathCollection(update_func=update_prop)})
+    plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$S_{VN}$")
+    plt.savefig(plotdir + "Entropy_Plot_m1_{}.png".format(str(m).replace('.','')))
+
 #Plot the hamiltonians with color and size based on value
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_subplot(projection = '3d')
@@ -98,3 +123,28 @@ ax.set_zlabel("$v_y$ value")
 sc = ax.scatter(hamiltonian[:,0], hamiltonian[:,1], hamiltonian[:,2], c = hamiltonian[:,3], cmap = plt.get_cmap('cool'))
 plt.colorbar(sc, fraction=0.036, pad = 0.1, label = "$H_{x}$")
 plt.savefig(plotdir + "Hamiltonian_Plot_Unsized.png")
+
+#Plot the hamiltonian with color and size based on value on a 2D plot
+m1Vals = np.unique(hamiltonian[:,0])
+for m in m1Vals:
+    fig = plt.figure(figsize=(6,6))
+    ax = fig.add_subplot()
+    #ax.view_init(30,110,0)
+
+    ax.set_xlabel("$m_2$ value")
+    ax.set_ylabel("$v_y$ value")
+
+    markersize = 50
+    def update_prop(handle, orig):
+        handle.update_from(orig)
+        handle.set_sizes([markersize])
+
+    sc = 0
+    ptr = 0
+    vals = hamiltonian[(hamiltonian[:,0] == m)]
+    sizes = [(10*n/max_hamiltonian)**2 for n in vals[:,3]]
+    sc = ax.scatter(vals[:,1], vals[:,2], c = vals[:,3], cmap = plt.get_cmap('cool'))
+    ptr += 1
+    #ax.legend(title="$m_1$ Value",handler_map={type(sc): HandlerPathCollection(update_func=update_prop)})
+    plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$H_{x}$")
+    plt.savefig(plotdir + "Hamiltonian_Plot_m1_{}.png".format(str(m).replace('.','')))
