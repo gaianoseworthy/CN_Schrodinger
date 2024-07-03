@@ -138,7 +138,7 @@ sol = CN(wavefunc,n=n,m=m,N=N,
          lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
 #outdir = os.path.join(os.getcwd(),"output/test_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
-csvdir = os.path.join(os.getcwd(),"output/125_results/")
+csvdir = os.path.join(os.getcwd(),"output/125_results/CSVs/")
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(csvdir):
     os.makedirs(csvdir)
@@ -210,12 +210,9 @@ for i in range (0,N+1):
 Zmax = Z.max()
 
 #m1,m2,vy, VAL
-with open(csvdir + "Hamiltonian_Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+with open(csvdir + "Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter = ",")
-    csvwriter.writerows([[m1,m2,vy, observables[-1,3]]])
-with open(csvdir + "Entropy_Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
-    csvwriter = csv.writer(csvfile, delimiter = ",")
-    csvwriter.writerows([[m1,m2,vy, observables[-1,2]]])
+    csvwriter.writerows([[m1,m2,vy, observables[-1,3], observables[-1,2]]])
 
 #np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
 
