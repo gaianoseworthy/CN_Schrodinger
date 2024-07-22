@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.integrate as integrate
+from scipy.integrate import solve_ivp
 import scipy.sparse as sps
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -60,7 +61,7 @@ def RK4(update_func,
 
     #Make array of frames
     N = int((tf-t0)/h)
-    frames = np.linspace(0,N,N_frames,dtype='int').tolist()
+    frames = np.linspace(t0,tf,N_frames).tolist()
 
     #Define matrices for x and y
     vals_out = np.zeros((4, N_frames), dtype = 'float64')
@@ -72,35 +73,21 @@ def RK4(update_func,
     count = 0
     var = [m1,m2,lam]
     st = time.time()
-    for i in range(1,N+1):
-        k1 = update_func(t,       cur_vals,          var)
-        k2 = update_func(t + h/2, cur_vals + h*k1/2, var)
-        k3 = update_func(t + h/2, cur_vals + h*k2/2, var)
-        k4 = update_func(t + h,   cur_vals + h*k3,   var)
-        cur_vals = cur_vals + (h/6)*(k1+2*k2+2*k3+k4)
-        if i in frames:
-            count = count + 1
-            vals_out[:,count] = cur_vals
-            #elapsed = datetime.timedelta(seconds=round(time.time()-st))
-            #remaining = datetime.timedelta(seconds=round((time.time()-st)/i*(N-i)))
-            #print(round(i/N*100),'% ',elapsed,'elapsed',remaining,'remaining',end='\r')
-        t = t + h
+    sol = solve_ivp(update_func, [t0, tf], cur_vals, method='RK45',
+                    t_eval = frames, args = var)
     #print('************************************************************************')
     #t_cur = time.time()-st
     #elapsed = datetime.timedelta(seconds=round(t_cur))
     #elapsed_per_node = seconds=t_cur/n/m/N*1e6
     #print('time elapsed:',elapsed)
     #print('************************************************************************')
-    return(vals_out)
+    return(sol.y)
 
-def update_func(t, vals, var):
+def update_func(t, vals, m1,m2,lam):
     x = vals[0]
     y = vals[1]
     px = vals[2]
     py = vals[3]
-    m1 = var[0]
-    m2 = var[1]
-    lam = var[2]
     #Return x', y', px', py'
     return(np.array([px/m1, py/m2, -1*(m1*x + lam * np.exp(x-y)), lam*np.exp(x-y)]))
 

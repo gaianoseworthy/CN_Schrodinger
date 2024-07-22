@@ -38,12 +38,11 @@ hamiltonian = np.zeros((125,4))
 mvals = [0.5, 1, 2, 5, 10]
 vyvals = [0.1, 0.5, 1, 2, 5]
 for val in tqdm(range(0,125)):
-    m1 = mvals[int(val/25)]
-    m2 = mvals[int((val%25)/5)]
-    vy = vyvals[int(val%5)]
     #Load the two CSVs
     job = np.genfromtxt(csvdir + "Job{}.csv".format(val), delimiter=',')
-
+    m1 = job[0,0]
+    m2 = job[0,1]
+    vy = job[0,2]
     x = job[1:,0]
     y = job[1:,1]
     px = job[1:,2]
@@ -58,8 +57,9 @@ for val in tqdm(range(0,125)):
 
     sc = ax.plot(x,y)
     plt.savefig(plotdir + "Job{}_Plot.png".format(val))
+    plt.close()
 
-    hamiltonian[val] = [m1,m2,vy,px[-1]**2/(2*m1) + m1*x[-1]**2/2]
+    hamiltonian[val] = [m1,m2,vy,(px[-1])**2/(2*m1) + m1*((x[-1])**2)/2]
 
 #Plot the hamiltonians with ONLY color based on value
 fig = plt.figure(figsize=(6,6))
@@ -73,6 +73,7 @@ ax.set_zlabel("$v_y$ value")
 sc = ax.scatter(hamiltonian[:,0], hamiltonian[:,1], hamiltonian[:,2], c = hamiltonian[:,3], cmap = plt.get_cmap('cool'))
 plt.colorbar(sc, fraction=0.036, pad = 0.1, label = "$H_{x}$")
 plt.savefig(plotdir + "Hamiltonian_Plot_Unsized.png")
+plt.close()
 
 #Plot the hamiltonian with color and size based on value on a 2D plot
 m1Vals = np.unique(hamiltonian[:,0])
@@ -94,3 +95,4 @@ for m in m1Vals:
     ax.legend()
     #plt.colorbar(sc, fraction=0.046, pad = 0.1, label = "$S_{VN}$")
     plt.savefig(plotdir + "Hamiltonian_Plot_m1_{}.png".format(str(m).replace('.','')))
+    plt.close()
