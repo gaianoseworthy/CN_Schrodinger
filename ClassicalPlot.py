@@ -61,6 +61,10 @@ for val in tqdm(range(0,125)):
 
     hamiltonian[val] = [m1,m2,vy,(px[-1])**2/(2*m1) + m1*((x[-1])**2)/2]
 
+with open(csvdir + "Hamiltonians.csv".format(val), 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter = ",")
+        csvwriter.writerows(hamiltonian)
+
 #Plot the hamiltonians with ONLY color based on value
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_subplot(projection = '3d')

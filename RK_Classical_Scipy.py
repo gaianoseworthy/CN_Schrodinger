@@ -73,7 +73,7 @@ def RK4(update_func,
     count = 0
     var = [m1,m2,lam]
     st = time.time()
-    sol = solve_ivp(update_func, [t0, tf], cur_vals, method='RK45',
+    sol = solve_ivp(update_func, [t0, tf], cur_vals, method='Radau',
                     t_eval = frames, args = var)
     #print('************************************************************************')
     #t_cur = time.time()-st
@@ -116,3 +116,6 @@ for val in tqdm(range(0,125)):
         csvwriter = csv.writer(csvfile, delimiter = ",")
         csvwriter.writerow([m1,m2,vy,lam])
         csvwriter.writerows(sol.T)
+
+    hamil = np.array((sol[2])**2/(2*m1) + m1*((sol[0])**2)/2)
+    np.savetxt(csvdir + "Job{}_FullHamil.csv".format(val), hamil, delimiter='\n')

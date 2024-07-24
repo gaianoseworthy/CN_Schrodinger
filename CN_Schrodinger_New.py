@@ -34,7 +34,8 @@ n = 100
 m = 1000
 N = 1000
 
-mvals = [0.5, 1, 2, 5, 10]
+#mvals = [0.5, 1, 2, 5, 10]
+mvals = [3, 4, 6, 7, 8]
 vyvals = [0.1, 0.5, 1, 2, 5]
 
 val = int(sys.argv[1])
@@ -210,10 +211,13 @@ for i in range (0,N+1):
 Zmax = Z.max()
 
 #m1,m2,vy, VAL
-with open(csvdir + "Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+with open(csvdir + "Set2_Job{}.csv".format(sys.argv[1]+124), 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter = ",")
     csvwriter.writerows([[m1,m2,vy, observables[-1,3], observables[-1,2]]])
 
+with open(csvdir + "Set2_Job{}_AllHE.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+    csvwriter = csv.writer(csvfile, delimiter = ",")
+    csvwriter.writerows(np.array([observables[:,3], observables[:,2]]).T)
 #np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
 
 ## PLOT ERROR
