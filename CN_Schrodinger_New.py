@@ -36,12 +36,12 @@ N = 1000
 
 mvals = [0.5, 1, 2, 5, 10]
 mvals2 = [3, 4, 6, 7, 8]
-#vyvals = [0.1, 0.5, 1, 2, 5]
-vyvals = [0, 1.5, 2.5, 3, 4]
+vyvals = [0.1, 0.5, 1, 2, 5]
+#vyvals = [0, 1.5, 2.5, 3, 4]
 
 val = int(sys.argv[1])
 m1 = mvals[int(val/25)]
-m2 = mvals2[int((val%25)/5)]
+m2 = mvals[int((val%25)/5)]
 vy = vyvals[int(val%5)]
 
 def CN(f, x0=0,y0=0,vx=0,vy=0,n=10,m=10,left=0,right=2,
@@ -140,7 +140,7 @@ sol = CN(wavefunc,n=n,m=m,N=N,
          lam=1,m1=m1,m2=m2,vx=0,vy=vy,t_max=40, N_frames = 401)
 
 #outdir = os.path.join(os.getcwd(),"output/test_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
-csvdir = os.path.join(os.getcwd(),"output/125_results/CSVs/")
+csvdir = os.path.join(os.getcwd(),"output/125_quantum/CSVs/")
 UNIQUE_STRING = "Test_{}x{}x{}".format(n,m,N)
 if not os.path.exists(csvdir):
     os.makedirs(csvdir)
@@ -212,11 +212,11 @@ for i in range (0,N+1):
 Zmax = Z.max()
 
 #m1,m2,vy, VAL
-with open(csvdir + "Set8_Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+with open(csvdir + "Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter = ",")
     csvwriter.writerows([[m1,m2,vy, observables[-1,3], observables[-1,2]]])
 
-with open(csvdir + "Set8_Job{}_AllHE.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+with open(csvdir + "Job{}_AllHE.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter = ",")
     csvwriter.writerows(np.array([observables[:,3], observables[:,2]]).T)
 #np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
