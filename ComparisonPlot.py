@@ -32,14 +32,13 @@ plt.rcParams['savefig.dpi'] = 300
 
 #Set path to CSV files
 classicaldir = os.path.join(os.getcwd(),"output/125_classical/CSVs/")
-quantumdir = os.path.join(os.getcwd(),"output/125_results/CSVs/")
-plotdir = os.path.join(os.getcwd(),"output/125_comparison/")
+quantumdir = os.path.join(os.getcwd(),"output/125_quantum/CSVs/")
+plotdir = os.path.join(os.getcwd(),"output/125_comparison/Special_Comparison/")
 if not os.path.exists(plotdir):
     os.makedirs(plotdir)
 
-mvals = [0.5, 1, 2, 5, 10]
-mvals2 = [3, 4, 6, 7, 8]
-vyvals = [0.1, 0.5, 1, 2, 5]
+mvals = [0.5, 1, 1.5, 2, 2.5]
+vyvals = [5,7.5, 10, 15, 20]
 
 for val in range(0,125):
     m1 = mvals[int(val/25)]

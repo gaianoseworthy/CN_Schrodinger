@@ -7,4 +7,4 @@
 #SBATCH --mem=4G
 module load python/3.10
 module load scipy-stack
-python -u "CN_Schrodinger_New4.py" $SLURM_ARRAY_TASK_ID
+python -u "CN_Schrodinger_New.py" $SLURM_ARRAY_TASK_ID

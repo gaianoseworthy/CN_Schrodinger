@@ -32,12 +32,12 @@ params = {"ytick.color" : "black",
           "font.serif" : ["Computer Modern Serif"]}
 plt.rcParams.update(params)
 plt.rcParams['savefig.dpi'] = 300
-n = 100
+n = 1000
 m = 1000
-N = 1000
+N = 10000
 
-mvals = [0.5, 1, 2, 5, 10]
-vyvals = [0.1, 0.5, 1, 2, 5]
+mvals = [0.5, 1, 1.5, 2, 2.5]
+vyvals = [5,7.5, 10, 15, 20]
 
 def RK4(update_func,
         x0=0,y0=0,vx=0,vy=0,
@@ -99,9 +99,9 @@ for val in tqdm(range(0,125)):
 
     sol = RK4(update_func,
             x0=0,y0=20,vx=0,vy=-vy,
-            t0 = 0, tf = 40, h = 0.001,
+            t0 = 0, tf = 40, h = 0.0001,
             m1 = m1, m2 = m2, lam=lam,
-            t_max=20,N_frames=201)
+            t_max=20,N_frames=401)
 
     #outdir = os.path.join(os.getcwd(),"output/test_results/Job{}_{}_{}_{}/".format(sys.argv[1], int(m1),int(m2),int(vy)))
     csvdir = os.path.join(os.getcwd(),"output/125_classical/CSVs/")
