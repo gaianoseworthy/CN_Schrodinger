@@ -129,7 +129,6 @@ for val in tqdm(range(0,125)):
         csvwriter = csv.writer(csvfile, delimiter = ",")
         csvwriter.writerow([m1,m2,vy,lam])
         csvwriter.writerows(sol.T)
-    with open(csvdir + "Job{}_FullH.csv".format(val), 'w', newline='') as csvfile:
-        csvwriter = csv.writer(csvfile, delimiter = ",")
-        hamil = (sol[2])**2/(2*m1) + m1*((sol[0])**2)/2
-        csvwriter.writerows(np.array(sol).T)
+
+    hamil = np.array((sol[2])**2/(2*m1) + m1*((sol[0])**2)/2)
+    np.savetxt(csvdir + "Job{}_FullHamil.csv".format(val), hamil, delimiter='\n')

@@ -31,11 +31,11 @@ params = {"ytick.color" : "black",
 plt.rcParams.update(params)
 plt.rcParams['savefig.dpi'] = 300
 n = 100
-m = 1000
-N = 1000
+m = 2000
+N = 2000
 
 mvals = [0.5, 1, 1.5, 2, 2.5]
-vyvals = [5,7.5, 10, 15, 20]
+vyvals = [1,2,5,7.5,10]
 #vyvals = [0, 1.5, 2.5, 3, 4]
 
 val = int(sys.argv[1])
@@ -210,14 +210,10 @@ for i in range (0,N+1):
 
 Zmax = Z.max()
 
-#m1,m2,vy, VAL
-with open(csvdir + "Job{}.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
+with open(csvdir + "Job{}_AllXYPxPy.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
     csvwriter = csv.writer(csvfile, delimiter = ",")
-    csvwriter.writerows([[m1,m2,vy, observables[-1,3], observables[-1,2]]])
-
-with open(csvdir + "Job{}_AllHE.csv".format(sys.argv[1]), 'w', newline='') as csvfile:
-    csvwriter = csv.writer(csvfile, delimiter = ",")
-    csvwriter.writerows(np.array([observables[:,3], observables[:,2]]).T)
+    csvwriter.writerows(np.array(["Hamiltonian", "Entropy", "<x>", "<y>", "Px", "Py"]))
+    csvwriter.writerows(np.array([observables[:,3],observables[:,2],observables[:,5], observables[:,7], observables[:,9], observables[:,10]]).T)
 #np.save(outdir + "CNSObservables_{}.npy".format(UNIQUE_STRING), observables)
 
 ## PLOT ERROR

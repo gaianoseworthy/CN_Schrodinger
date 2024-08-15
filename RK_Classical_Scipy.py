@@ -37,7 +37,7 @@ m = 1000
 N = 10000
 
 mvals = [0.5, 1, 1.5, 2, 2.5]
-vyvals = [5,7.5, 10, 15, 20]
+vyvals = [1,2,5,7.5,10]
 
 def RK4(update_func,
         x0=0,y0=0,vx=0,vy=0,
@@ -73,7 +73,7 @@ def RK4(update_func,
     count = 0
     var = [m1,m2,lam]
     st = time.time()
-    sol = solve_ivp(update_func, [t0, tf], cur_vals, method='Radau',
+    sol = solve_ivp(update_func, [t0, tf], cur_vals, method='RK45',
                     t_eval = frames, args = var)
     #print('************************************************************************')
     #t_cur = time.time()-st

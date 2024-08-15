@@ -40,16 +40,15 @@ if not os.path.exists(plotdir):
 mvals = [0.5, 1, 1.5, 2, 2.5]
 vyvals = [5,7.5, 10, 15, 20]
 
-for val in range(0,125):
+for val in tqdm(range(0,125)):
     m1 = mvals[int(val/25)]
     m2 = mvals[int((val%25)/5)]
     vy = vyvals[int(val%5)]
     try:
-        hamiltonianClassical = np.genfromtxt(classicaldir + "Job{}_FullHamil.csv".format(val), delimiter=',')
-        timeClassical = np.linspace(start = 0, stop = 40, num = len(hamiltonianClassical))
-        hamiltonianQuantum = np.genfromtxt(quantumdir + "Job{}_AllHE.csv".format(val), delimiter=',')
-        hamiltonianQuantum[:,0] -= 0.5
-        timeQuantum = np.linspace(start = 0, stop = 40, num = len(hamiltonianQuantum))
+        classical = np.genfromtxt(classicaldir + "Job{}.csv".format(val), delimiter=',')
+        timeClassical = np.linspace(start = 0, stop = 40, num = len(classical))
+        quantum = np.genfromtxt(quantumdir + "Job{}_AllXYPxPy.csv".format(val), delimiter=',')
+        timeQuantum = np.linspace(start = 0, stop = 40, num = len(quantum))
 
 
         #Plot the hamiltonians with ONLY color based on value
@@ -57,14 +56,29 @@ for val in range(0,125):
         ax = fig.add_subplot()
         #ax.view_init(30,110,0)
 
-        ax.set_xlabel("Time Step")
-        ax.set_ylabel("$m_2$ value")
+        ax.set_xlabel("$<x>$")
+        ax.set_ylabel("$<y>$")
 
-        sc = ax.plot(timeClassical, hamiltonianClassical, label = "Classical")
-        sc = ax.plot(timeQuantum, hamiltonianQuantum[:,0], label = "Quantum - 0.5")
+        sc = ax.plot(classical[1:,0], classical[1:,1], label = "Classical")
+        sc = ax.plot(quantum[:,2], quantum[:,3], label = "Quantum")
         ax.legend()
         fig.text(0.5,  0.01, "Params: m1={}, m2={}, vy={}".format(m1,m2,vy), ha='center')
-        plt.savefig(plotdir + "Job{}.png".format(val, m1, m2, vy))
+        plt.savefig(plotdir + "Position{}.png".format(val, m1, m2, vy))
+        plt.close()
+
+        #Plot the hamiltonians with ONLY color based on value
+        fig = plt.figure(figsize=(6,6))
+        ax = fig.add_subplot()
+        #ax.view_init(30,110,0)
+
+        ax.set_xlabel("$Px$ value")
+        ax.set_ylabel("$Py$ value")
+
+        sc = ax.plot(classical[1:,2], classical[1:,3], label = "Classical")
+        sc = ax.plot(quantum[:,4], quantum[:,5], label = "Quantum")
+        ax.legend()
+        fig.text(0.5,  0.01, "Params: m1={}, m2={}, vy={}".format(m1,m2,vy), ha='center')
+        plt.savefig(plotdir + "Momentum{}.png".format(val, m1, m2, vy))
         plt.close()
     except OSError as e:
         print("Error: Job {} Not Found.".format(val))
